@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "HoloBurger",
+    "slug": "HoloBurger",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon3.png",
+    "splash": {
+      "image": "./assets/splash3.png",
+      "backgroundColor": "#4970ad"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.eryetchen.holoburger",
+      "versionCode": 1,
+      "useNextNotificationsApi": true
+    },
+    "ios": {
+      "bundleIdentifier": "com.eryetchen.holoburger",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
