@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   FlatList,
+  Animated,
+  Dimensions,
   Linking,
   RefreshControl,
 } from "react-native";

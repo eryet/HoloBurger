@@ -10,16 +10,17 @@ const UpcomingTimer = (props) => {
 
   // if timer hit callback refresh
   useEffect(() => {
-    setInterval(
+    const counter = setInterval(
       () =>
         setCountdown(
           formatDistanceToNow(new Date(props.schedule), {
             includeSeconds: true,
           })
         ),
+
       1000
     );
-    console.log(countdown);
+    return () => clearInterval(counter);
   }, []);
 
   return (
