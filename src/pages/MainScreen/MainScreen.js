@@ -20,8 +20,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import UpcomingTimer from "./UpcomingTimer";
 import styles from "./Styles";
-import styles2 from "./Styles2";
-import Header2 from "../Header/Header2";
+import headerStyles from "./headerStyles";
 
 const kFormatter = (num) => {
   return Math.abs(num) > 999
@@ -155,14 +154,14 @@ const MainScreen = (props) => {
   const FlatListHeader = () => {
     return (
       <View>
-        <View style={styles2.flexrow}>
+        <View style={headerStyles.flexrow}>
           <View>
             <Image
               source={require("../../../assets/fubuki_burger.gif")}
-              style={styles2.header_gif}
+              style={headerStyles.header_gif}
             />
           </View>
-          <View style={styles2.right_view}>
+          <View style={headerStyles.right_view}>
             <Image source={require("../../../assets/cap_holoburger.png")} />
           </View>
           <Menu>

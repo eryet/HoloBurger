@@ -62,6 +62,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
   },
+  flexrowsort: {
+    marginTop: 10,
+    marginRight: 10,
+    alignItems: "center",
+  },
 });
 
 export default styles;

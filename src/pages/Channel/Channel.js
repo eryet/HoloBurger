@@ -11,10 +11,16 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import Constants from "expo-constants";
+import Menu, {
+  MenuProvider,
+  MenuTrigger,
+  MenuOptions,
+  MenuOption,
+} from "react-native-popup-menu";
+import { MaterialIcons } from "@expo/vector-icons";
 
 import styles from "./Styles";
-import Header2 from "../Header/Header2";
+import headerStyles from "./headerStyles";
 
 const HoloChannel = ({ item }) => {
   return (
@@ -46,9 +52,23 @@ const Channel = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch("https://api.holotools.app/v1/channels/?limit=50")
-      .then((response) => response.json())
-      .then((json) => setData(json))
+    Promise.all([
+      fetch("https://api.holotools.app/v1/channels/?limit=50"),
+      fetch("https://api.holotools.app/v1/channels/?limit=10&order=desc"),
+    ])
+      .then(([response1, response2]) =>
+        Promise.all([response1.json(), response2.json()])
+      )
+      .then(([response1, response2]) => {
+        const merge = response1.channels.concat(response2.channels);
+        const sortedMerge = merge.sort((a, b) => {
+          return (
+            new Date(a.published_at).getTime() -
+            new Date(b.published_at).getTime()
+          );
+        });
+        setData([...sortedMerge]);
+      })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
   }, []);
@@ -57,20 +77,63 @@ const Channel = () => {
     return <HoloChannel item={item} />;
   };
 
+  const sortByPublishTime = () => {
+    const sorted = [...data].sort((a, b) => {
+      return (
+        new Date(a.published_at).getTime() - new Date(b.published_at).getTime()
+      );
+    });
+    console.log(sorted);
+    setData(sorted);
+  };
+
+  const sortByPublishTime2 = () => {
+    const sorted = [...data].sort((a, b) => {
+      return (
+        new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+      );
+    });
+    console.log(sorted);
+    setData(sorted);
+  };
+
+  const ChannelHeader = () => {
+    return (
+      <View>
+        <View style={headerStyles.flexrow}>
+          <View>
+            <Image
+              source={require("../../../assets/fubuki_burger.gif")}
+              style={headerStyles.header_gif}
+            />
+          </View>
+          <View style={headerStyles.right_view}>
+            <Image source={require("../../../assets/cap_holoburger.png")} />
+          </View>
+          <Menu>
+            <MenuTrigger style={styles.flexrowsort}>
+              <MaterialIcons name="sort" size={30} color="white" />
+            </MenuTrigger>
+            <MenuOptions customStyles={optionsStyles}>
+              <MenuOption onSelect={sortByPublishTime} text="Oldest Channel" />
+              <MenuOption onSelect={sortByPublishTime2} text="Latest Channel" />
+            </MenuOptions>
+          </Menu>
+        </View>
+      </View>
+    );
+  };
+
   if (isLoading === false) {
     return (
       <SafeAreaView style={styles.container}>
         <FlatList
-          data={[...data.channels].sort((a, b) => {
-            return (
-              new Date(a.published_at).getTime() -
-              new Date(b.published_at).getTime()
-            );
-          })}
+          data={data}
           renderItem={renderItem}
           keyExtractor={(item) => item.yt_channel_id}
-          ListHeaderComponent={<Header2 />}
+          ListHeaderComponent={<ChannelHeader />}
           stickyHeaderIndices={[0]}
+          extraData={data}
         />
       </SafeAreaView>
     );
@@ -84,4 +147,17 @@ const Channel = () => {
     );
   }
 };
+
+// sort by popupmenu styles
+const optionsStyles = {
+  optionsContainer: {
+    backgroundColor: "#333333",
+    padding: 10,
+  },
+  optionText: {
+    fontSize: 20,
+    color: "white",
+  },
+};
+
 export default Channel;
