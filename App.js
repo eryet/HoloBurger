@@ -35,7 +35,9 @@ const App = () => {
   // SplashScreen.hideAsync();
 
   useEffect(() => {
-    fetch("https://api.holotools.app/v1/live")
+    fetch(
+      "https://api.holotools.app/v1/live?max_upcoming_hours=730&hide_channel_desc=1"
+    )
       .then((response) => response.json())
       .then((json) => setData(json))
       .catch((error) => console.error(error))
@@ -45,7 +47,9 @@ const App = () => {
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     try {
-      let response = await fetch("https://api.holotools.app/v1/live");
+      let response = await fetch(
+        "https://api.holotools.app/v1/live?max_upcoming_hours=730&hide_channel_desc=1"
+      );
       let json = await response.json();
       setData(json);
       setRefreshing(false);
@@ -99,6 +103,29 @@ const App = () => {
                 <MainScreen
                   data={[...data.upcoming]}
                   status={"upcoming"}
+                  onRefresh={onRefresh}
+                  refreshing={refreshing}
+                />
+              )}
+            />
+            <Tab.Screen
+              name="Ended"
+              options={{
+                tabBarLabel: "Ended!",
+                tabBarColor: "#303030",
+                tabBarIcon: ({ color, size }) => (
+                  <MaterialCommunityIcons
+                    name="video-off"
+                    size={24}
+                    color={color}
+                  />
+                ),
+                tabBarBadge: data.ended.length,
+              }}
+              children={() => (
+                <MainScreen
+                  data={[...data.ended]}
+                  status={"ended"}
                   onRefresh={onRefresh}
                   refreshing={refreshing}
                 />

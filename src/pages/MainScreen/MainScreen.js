@@ -15,7 +15,6 @@ import Menu, {
   MenuOptions,
   MenuOption,
 } from "react-native-popup-menu";
-import { format, formatDistanceToNow } from "date-fns";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import UpcomingTimer from "./UpcomingTimer";
@@ -29,9 +28,10 @@ const kFormatter = (num) => {
 };
 
 const Live = ({ item }) => {
-  const countdown = formatDistanceToNow(new Date(item.live_schedule), {
-    includeSeconds: true,
-  });
+  const options = { day: "numeric", month: "short" };
+  const countdown = new Date(item.live_end)
+    .toLocaleString()
+    .replace("2020", "");
   return (
     <View style={styles.item}>
       <TouchableOpacity
@@ -63,6 +63,11 @@ const Live = ({ item }) => {
             {item.status === "live" && (
               <Text style={styles.youtube_channel} numberOfLines={1}>
                 {kFormatter(item.live_viewers)} watching!
+              </Text>
+            )}
+            {item.status === "past" && (
+              <Text style={styles.youtube_channel} numberOfLines={2}>
+                {countdown}
               </Text>
             )}
             {item.status === "upcoming" && (
@@ -99,6 +104,11 @@ const MainScreen = (props) => {
     () =>
       setData(
         [...props.data].sort((a, b) => {
+          if (props.status === "ended") {
+            return (
+              new Date(a.live_end).getTime() - new Date(b.live_end).getTime()
+            );
+          }
           return (
             new Date(a.live_schedule).getTime() -
             new Date(b.live_schedule).getTime()
@@ -150,7 +160,21 @@ const MainScreen = (props) => {
     setData(sorted);
   };
 
-  // flatlist header with sortby
+  const sortByLiveEnded = () => {
+    const sorted = [...data].sort((a, b) => {
+      return new Date(a.live_end).getTime() - new Date(b.live_end).getTime();
+    });
+    setData(sorted);
+  };
+
+  const sortByLiveEnded2 = () => {
+    const sorted = [...data].sort((a, b) => {
+      return new Date(b.live_end).getTime() - new Date(a.live_end).getTime();
+    });
+    setData(sorted);
+  };
+
+  // flatlist header with sortBy
   const FlatListHeader = () => {
     return (
       <View>
@@ -204,6 +228,12 @@ const MainScreen = (props) => {
                   onSelect={sortByLiveSchedule2}
                   text="Latest Upcoming"
                 />
+              )}
+              {props.status === "ended" && (
+                <MenuOption onSelect={sortByLiveEnded} text="Oldest Ended" />
+              )}
+              {props.status === "ended" && (
+                <MenuOption onSelect={sortByLiveEnded2} text="Newest Ended" />
               )}
             </MenuOptions>
           </Menu>
