@@ -82,7 +82,9 @@ const App = () => {
               }}
               children={() => (
                 <MainScreen
-                  data={[...data.live]}
+                  data={[...data.live].filter((data) => {
+                    return data.live_start !== null;
+                  })}
                   status={"live"}
                   onRefresh={onRefresh}
                   refreshing={refreshing}
