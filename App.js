@@ -1,8 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
-import { ActivityIndicator, View, Text, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  View,
+  Text,
+  StyleSheet,
+  YellowBox,
+} from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MenuProvider } from "react-native-popup-menu";
+import TabBar from "./TabBar";
 import {
   MaterialIcons,
   MaterialCommunityIcons,
@@ -14,6 +21,8 @@ import MainScreen from "./src/pages/MainScreen/MainScreen";
 import Channel from "./src/pages/Channel/Channel";
 
 const Tab = createBottomTabNavigator();
+
+YellowBox.ignoreWarnings(["Animated: `useNativeDriver` was not specified."]);
 
 const DarkTheme = {
   ...DefaultTheme,
@@ -61,95 +70,47 @@ const App = () => {
   if (isLoading === false) {
     return (
       <MenuProvider>
-        <NavigationContainer>
-          <Tab.Navigator
-            initialRouteName="live"
-            tabBarOptions={{
-              activeTintColor: "#38abe0",
-              inactiveTintColor: "#909090",
-              inactiveBackgroundColor: "#212121",
-              activeBackgroundColor: "#212121",
-            }}
+        <TabBar bgNavBar="white" bgNavBarSelector="white" stroke="skyblue">
+          <TabBar.Item
+            icon={require("./assets/HoloBurgerIcon.png")}
+            selectedIcon={require("./assets/HoloBurgerIcon.png")}
+            title="Live"
+            screenBackgroundColor={{ backgroundColor: "#008080" }}
           >
-            <Tab.Screen
-              name="live"
-              options={{
-                tabBarLabel: "Live!",
-                tabBarIcon: ({ color, size }) => (
-                  <MaterialIcons name="live-tv" size={24} color={color} />
-                ),
-                tabBarBadge: data.live.length,
-              }}
-              children={() => (
-                <MainScreen
-                  data={[...data.live].filter((data) => {
-                    return data.live_start !== null;
-                  })}
-                  status={"live"}
-                  onRefresh={onRefresh}
-                  refreshing={refreshing}
-                />
-              )}
+            <MainScreen
+              data={[...data.live]}
+              status={"ended"}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
             />
-            <Tab.Screen
-              name="Upcoming"
-              options={{
-                tabBarLabel: "Upcoming!",
-                tabBarColor: "#303030",
-                tabBarIcon: ({ color, size }) => (
-                  <FontAwesome5 name="hamburger" size={24} color={color} />
-                ),
-                tabBarBadge: data.upcoming.length,
-              }}
-              children={() => (
-                <MainScreen
-                  data={[...data.upcoming]}
-                  status={"upcoming"}
-                  onRefresh={onRefresh}
-                  refreshing={refreshing}
-                />
-              )}
+          </TabBar.Item>
+          <TabBar.Item
+            icon={require("./assets/HoloBurgerIcon.png")}
+            selectedIcon={require("./assets/HoloBurgerIcon.png")}
+            title="Upcoming"
+            screenBackgroundColor={{ backgroundColor: "#F08080" }}
+          >
+            <MainScreen
+              data={[...data.upcoming]}
+              status={"ended"}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
             />
-            <Tab.Screen
-              name="Ended"
-              options={{
-                tabBarLabel: "Ended!",
-                tabBarColor: "#303030",
-                tabBarIcon: ({ color, size }) => (
-                  <MaterialCommunityIcons
-                    name="video-off"
-                    size={24}
-                    color={color}
-                  />
-                ),
-                tabBarBadge: data.ended.length,
-              }}
-              children={() => (
-                <MainScreen
-                  data={[...data.ended]}
-                  status={"ended"}
-                  onRefresh={onRefresh}
-                  refreshing={refreshing}
-                />
-              )}
+          </TabBar.Item>
+          <TabBar.Item
+            icon={require("./assets/HoloBurgerIcon.png")}
+            selectedIcon={require("./assets/HoloBurgerIcon.png")}
+            title="Ended"
+            screenBackgroundColor={{ backgroundColor: "#485d72" }}
+          >
+            <MainScreen
+              data={[...data.ended]}
+              status={"ended"}
+              onRefresh={onRefresh}
+              refreshing={refreshing}
             />
-            <Tab.Screen
-              name="Channel"
-              options={{
-                tabBarLabel: "HoloChannel",
-                tabBarColor: "#303030",
-                tabBarIcon: ({ color, size }) => (
-                  <MaterialCommunityIcons
-                    name="youtube-subscription"
-                    size={24}
-                    color={color}
-                  />
-                ),
-              }}
-              component={Channel}
-            />
-          </Tab.Navigator>
-        </NavigationContainer>
+          </TabBar.Item>
+        </TabBar>
       </MenuProvider>
     );
   } else {
