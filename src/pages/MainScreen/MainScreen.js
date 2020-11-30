@@ -5,6 +5,7 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
+  TouchableHighlight,
   FlatList,
   Linking,
   RefreshControl,
@@ -16,6 +17,7 @@ import Menu, {
   MenuOption,
 } from "react-native-popup-menu";
 import { MaterialIcons } from "@expo/vector-icons";
+import { ImageLoader } from "react-native-image-fallback";
 
 import UpcomingTimer from "./UpcomingTimer";
 import styles from "./Styles";
@@ -29,6 +31,8 @@ const kFormatter = (num) => {
 
 const Live = ({ item }) => {
   const options = { day: "numeric", month: "short" };
+  const imagesource = `https://i.ytimg.com/vi/${item.yt_video_key}/mqdefault.jpg`;
+  const fallbacks = require("../../../assets/fbk_1m.png");
   const countdown = new Date(item.live_end)
     .toLocaleString()
     .replace("2020", "");
@@ -43,11 +47,10 @@ const Live = ({ item }) => {
         style={styles.youtube_link}
       >
         <View style={styles.youtube_link}>
-          <Image
-            source={{
-              uri: `https://i.ytimg.com/vi/${item.yt_video_key}/mqdefault.jpg`,
-            }}
+          <ImageLoader
+            source={imagesource}
             style={styles.thumbnail}
+            fallback={fallbacks}
           />
           <View style={styles.videolink_view}>
             <Text
@@ -175,7 +178,7 @@ const MainScreen = (props) => {
   };
 
   // flatlist header with sortBy
-  const FlatListHeader = () => {
+  const FlatListHeader = (childprops) => {
     return (
       <View>
         <View style={headerStyles.flexrow}>
@@ -186,7 +189,11 @@ const MainScreen = (props) => {
             />
           </View>
           <View style={headerStyles.right_view}>
-            <Image source={require("../../../assets/cap_holoburger.png")} />
+            <TouchableHighlight
+              onPress={() => childprops.navigation.navigate("About")}
+            >
+              <Image source={require("../../../assets/cap_holoburger.png")} />
+            </TouchableHighlight>
           </View>
           <Menu>
             <MenuTrigger style={styles.flexrowsort}>
@@ -248,7 +255,7 @@ const MainScreen = (props) => {
         data={data}
         renderItem={renderItem}
         keyExtractor={(item) => item.yt_video_key}
-        ListHeaderComponent={<FlatListHeader />}
+        ListHeaderComponent={<FlatListHeader navigation={props.navigation} />}
         stickyHeaderIndices={[0]}
         extraData={data}
         refreshControl={

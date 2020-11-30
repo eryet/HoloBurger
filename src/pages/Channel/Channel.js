@@ -5,6 +5,7 @@ import {
   View,
   SafeAreaView,
   SectionList,
+  TouchableHighlight,
   ActivityIndicator,
   FlatList,
   Linking,
@@ -18,6 +19,7 @@ import Menu, {
   MenuOption,
 } from "react-native-popup-menu";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 import styles from "./Styles";
 import headerStyles from "./headerStyles";
@@ -50,6 +52,7 @@ const HoloChannel = ({ item }) => {
 const Channel = () => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     Promise.all([
@@ -108,7 +111,9 @@ const Channel = () => {
             />
           </View>
           <View style={headerStyles.right_view}>
-            <Image source={require("../../../assets/cap_holoburger.png")} />
+            <TouchableHighlight onPress={() => navigation.navigate("About")}>
+              <Image source={require("../../../assets/cap_holoburger.png")} />
+            </TouchableHighlight>
           </View>
           <Menu>
             <MenuTrigger style={styles.flexrowsort}>

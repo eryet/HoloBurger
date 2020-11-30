@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { ActivityIndicator, View, Text, StyleSheet } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 import { MenuProvider } from "react-native-popup-menu";
 import {
   MaterialIcons,
@@ -12,8 +13,11 @@ import * as SplashScreen from "expo-splash-screen";
 
 import MainScreen from "./src/pages/MainScreen/MainScreen";
 import Channel from "./src/pages/Channel/Channel";
+import Video from "./src/pages/Video/Video";
+import About from "./src/pages/About/About";
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 const DarkTheme = {
   ...DefaultTheme,
@@ -58,99 +62,116 @@ const App = () => {
     }
   }, [refreshing]);
 
-  if (isLoading === false) {
+  const TabScreen = ({ navigation }) => {
     return (
       <MenuProvider>
-        <NavigationContainer>
-          <Tab.Navigator
-            initialRouteName="live"
-            tabBarOptions={{
-              activeTintColor: "#38abe0",
-              inactiveTintColor: "#909090",
-              inactiveBackgroundColor: "#212121",
-              activeBackgroundColor: "#212121",
+        <Tab.Navigator
+          initialRouteName="live"
+          tabBarOptions={{
+            activeTintColor: "#38abe0",
+            inactiveTintColor: "#909090",
+            inactiveBackgroundColor: "#212121",
+            activeBackgroundColor: "#212121",
+          }}
+        >
+          <Tab.Screen
+            name="live"
+            options={{
+              tabBarLabel: "Live!",
+              tabBarIcon: ({ color, size }) => (
+                <MaterialIcons name="live-tv" size={24} color={color} />
+              ),
+              tabBarBadge: data.live.length,
             }}
-          >
-            <Tab.Screen
-              name="live"
-              options={{
-                tabBarLabel: "Live!",
-                tabBarIcon: ({ color, size }) => (
-                  <MaterialIcons name="live-tv" size={24} color={color} />
-                ),
-                tabBarBadge: data.live.length,
-              }}
-              children={() => (
-                <MainScreen
-                  data={[...data.live].filter((data) => {
-                    return data.live_start !== null;
-                  })}
-                  status={"live"}
-                  onRefresh={onRefresh}
-                  refreshing={refreshing}
+            children={() => (
+              <MainScreen
+                data={[...data.live].filter((data) => {
+                  return data.live_start !== null;
+                })}
+                status={"live"}
+                onRefresh={onRefresh}
+                refreshing={refreshing}
+                navigation={navigation}
+              />
+            )}
+          />
+          <Tab.Screen
+            name="Upcoming"
+            options={{
+              tabBarLabel: "Upcoming!",
+              tabBarColor: "#303030",
+              tabBarIcon: ({ color, size }) => (
+                <FontAwesome5 name="hamburger" size={24} color={color} />
+              ),
+              tabBarBadge: data.upcoming.length,
+            }}
+            children={() => (
+              <MainScreen
+                data={[...data.upcoming]}
+                status={"upcoming"}
+                onRefresh={onRefresh}
+                refreshing={refreshing}
+                navigation={navigation}
+              />
+            )}
+          />
+          <Tab.Screen
+            name="Ended"
+            options={{
+              tabBarLabel: "Ended!",
+              tabBarColor: "#303030",
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons
+                  name="video-off"
+                  size={24}
+                  color={color}
                 />
-              )}
-            />
-            <Tab.Screen
-              name="Upcoming"
-              options={{
-                tabBarLabel: "Upcoming!",
-                tabBarColor: "#303030",
-                tabBarIcon: ({ color, size }) => (
-                  <FontAwesome5 name="hamburger" size={24} color={color} />
-                ),
-                tabBarBadge: data.upcoming.length,
-              }}
-              children={() => (
-                <MainScreen
-                  data={[...data.upcoming]}
-                  status={"upcoming"}
-                  onRefresh={onRefresh}
-                  refreshing={refreshing}
+              ),
+              tabBarBadge: data.ended.length,
+            }}
+            children={() => (
+              <MainScreen
+                data={[...data.ended]}
+                status={"ended"}
+                onRefresh={onRefresh}
+                refreshing={refreshing}
+                navigation={navigation}
+              />
+            )}
+          />
+          <Tab.Screen
+            name="Channel"
+            options={{
+              tabBarLabel: "HoloChannel",
+              tabBarColor: "#303030",
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons
+                  name="youtube-subscription"
+                  size={24}
+                  color={color}
                 />
-              )}
-            />
-            <Tab.Screen
-              name="Ended"
-              options={{
-                tabBarLabel: "Ended!",
-                tabBarColor: "#303030",
-                tabBarIcon: ({ color, size }) => (
-                  <MaterialCommunityIcons
-                    name="video-off"
-                    size={24}
-                    color={color}
-                  />
-                ),
-                tabBarBadge: data.ended.length,
-              }}
-              children={() => (
-                <MainScreen
-                  data={[...data.ended]}
-                  status={"ended"}
-                  onRefresh={onRefresh}
-                  refreshing={refreshing}
-                />
-              )}
-            />
-            <Tab.Screen
-              name="Channel"
-              options={{
-                tabBarLabel: "HoloChannel",
-                tabBarColor: "#303030",
-                tabBarIcon: ({ color, size }) => (
-                  <MaterialCommunityIcons
-                    name="youtube-subscription"
-                    size={24}
-                    color={color}
-                  />
-                ),
-              }}
-              component={Channel}
-            />
-          </Tab.Navigator>
-        </NavigationContainer>
+              ),
+            }}
+            children={() => <Channel navigation={navigation} />}
+          />
+        </Tab.Navigator>
       </MenuProvider>
+    );
+  };
+
+  if (isLoading === false) {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName="Home"
+        >
+          <Stack.Screen name="Home" component={TabScreen} />
+          <Stack.Screen name="About" component={About} />
+        </Stack.Navigator>
+      </NavigationContainer>
     );
   } else {
     return (
