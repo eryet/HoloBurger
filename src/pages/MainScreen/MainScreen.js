@@ -9,6 +9,7 @@ import {
   FlatList,
   Linking,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import Menu, {
   MenuProvider,
@@ -102,24 +103,24 @@ const Live = ({ item }) => {
 
 const MainScreen = (props) => {
   const [data, setData] = useState([...props.data]);
+  const [isLoading, setisLoading] = useState(true);
 
-  useEffect(
-    () =>
-      setData(
-        [...props.data].sort((a, b) => {
-          if (props.status === "ended") {
-            return (
-              new Date(a.live_end).getTime() - new Date(b.live_end).getTime()
-            );
-          }
+  useEffect(() => {
+    setData(
+      [...props.data].sort((a, b) => {
+        if (props.status === "ended") {
           return (
-            new Date(a.live_schedule).getTime() -
-            new Date(b.live_schedule).getTime()
+            new Date(a.live_end).getTime() - new Date(b.live_end).getTime()
           );
-        })
-      ),
-    [props]
-  );
+        }
+        return (
+          new Date(a.live_schedule).getTime() -
+          new Date(b.live_schedule).getTime()
+        );
+      })
+    );
+    setisLoading(false);
+  }, [props]);
 
   const renderItem = ({ item }) => {
     return (
@@ -249,24 +250,35 @@ const MainScreen = (props) => {
     );
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.yt_video_key}
-        ListHeaderComponent={<FlatListHeader navigation={props.navigation} />}
-        stickyHeaderIndices={[0]}
-        extraData={data}
-        refreshControl={
-          <RefreshControl
-            refreshing={props.refreshing}
-            onRefresh={props.onRefresh}
-          />
-        }
-      />
-    </SafeAreaView>
-  );
+  if (isLoading === false) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.yt_video_key}
+          ListHeaderComponent={<FlatListHeader navigation={props.navigation} />}
+          stickyHeaderIndices={[0]}
+          extraData={data}
+          refreshControl={
+            <RefreshControl
+              refreshing={props.refreshing}
+              onRefresh={props.onRefresh}
+            />
+          }
+        />
+      </SafeAreaView>
+    );
+  } else {
+    return (
+      <SafeAreaView style={styles.container}>
+        <FlatListHeader navigation={props.navigation} />
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color="#00ff00" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 };
 
 // sort by popupmenu styles

@@ -6,6 +6,12 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
     backgroundColor: "#303030",
   },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#303030",
+  },
   text: {
     color: "white",
     fontWeight: "bold",

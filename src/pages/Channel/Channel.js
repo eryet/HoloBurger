@@ -145,6 +145,7 @@ const Channel = () => {
   } else {
     return (
       <SafeAreaView style={styles.container}>
+        <ChannelHeader />
         <View style={styles.loading_container}>
           <ActivityIndicator size="large" color="#00ff00" />
         </View>

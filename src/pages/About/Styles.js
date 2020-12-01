@@ -33,10 +33,31 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "white",
   },
-  about_header: {
+  about: {
     marginTop: 20,
     fontSize: 15,
     color: "white",
+  },
+  about: {
+    marginTop: 20,
+    fontSize: 15,
+    color: "white",
+  },
+  about_list: {
+    marginTop: 20,
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
+  about_btm: {
+    marginTop: 20,
+    marginBottom: 20,
+    fontSize: 15,
+    color: "white",
+  },
+  bullet: {
+    color: "white",
+    width: 130,
   },
 });
 
