@@ -65,10 +65,7 @@ const Channel = () => {
       .then(([response1, response2]) => {
         const merge = response1.channels.concat(response2.channels);
         const sortedMerge = merge.sort((a, b) => {
-          return (
-            new Date(a.published_at).getTime() -
-            new Date(b.published_at).getTime()
-          );
+          return new Date(a.published_at) - new Date(b.published_at);
         });
         setData([...sortedMerge]);
       })
@@ -82,9 +79,7 @@ const Channel = () => {
 
   const sortByPublishTime = () => {
     const sorted = [...data].sort((a, b) => {
-      return (
-        new Date(a.published_at).getTime() - new Date(b.published_at).getTime()
-      );
+      return new Date(a.published_at) - new Date(b.published_at);
     });
     console.log(sorted);
     setData(sorted);
@@ -92,9 +87,7 @@ const Channel = () => {
 
   const sortByPublishTime2 = () => {
     const sorted = [...data].sort((a, b) => {
-      return (
-        new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
-      );
+      return new Date(b.published_at) - new Date(a.published_at);
     });
     console.log(sorted);
     setData(sorted);

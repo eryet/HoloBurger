@@ -103,28 +103,10 @@ const Live = ({ item }) => {
 
 const MainScreen = (props) => {
   const [data, setData] = useState([...props.data]);
-  const [isLoading, setisLoading] = useState(true);
-
-  useEffect(() => {
-    setData(
-      [...props.data].sort((a, b) => {
-        if (props.status === "ended") {
-          return (
-            new Date(a.live_end).getTime() - new Date(b.live_end).getTime()
-          );
-        }
-        return (
-          new Date(a.live_schedule).getTime() -
-          new Date(b.live_schedule).getTime()
-        );
-      })
-    );
-    setisLoading(false);
-  }, [props]);
 
   const renderItem = ({ item }) => {
     return (
-      <View>
+      <View key={item.key}>
         <Live item={item} />
       </View>
     );
@@ -132,20 +114,14 @@ const MainScreen = (props) => {
 
   const sortByLiveSchedule = () => {
     const sorted = [...data].sort((a, b) => {
-      return (
-        new Date(b.live_schedule).getTime() -
-        new Date(a.live_schedule).getTime()
-      );
+      return new Date(b.live_schedule) - new Date(a.live_schedule);
     });
     setData(sorted);
   };
 
   const sortByLiveSchedule2 = () => {
     const sorted = [...data].sort((a, b) => {
-      return (
-        new Date(a.live_schedule).getTime() -
-        new Date(b.live_schedule).getTime()
-      );
+      return new Date(a.live_schedule) - new Date(b.live_schedule);
     });
     setData(sorted);
   };
@@ -166,14 +142,14 @@ const MainScreen = (props) => {
 
   const sortByLiveEnded = () => {
     const sorted = [...data].sort((a, b) => {
-      return new Date(a.live_end).getTime() - new Date(b.live_end).getTime();
+      return new Date(a.live_end) - new Date(b.live_end);
     });
     setData(sorted);
   };
 
   const sortByLiveEnded2 = () => {
     const sorted = [...data].sort((a, b) => {
-      return new Date(b.live_end).getTime() - new Date(a.live_end).getTime();
+      return new Date(b.live_end) - new Date(a.live_end);
     });
     setData(sorted);
   };
@@ -250,35 +226,19 @@ const MainScreen = (props) => {
     );
   };
 
-  if (isLoading === false) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.yt_video_key}
-          ListHeaderComponent={<FlatListHeader navigation={props.navigation} />}
-          stickyHeaderIndices={[0]}
-          extraData={data}
-          refreshControl={
-            <RefreshControl
-              refreshing={props.refreshing}
-              onRefresh={props.onRefresh}
-            />
-          }
-        />
-      </SafeAreaView>
-    );
-  } else {
-    return (
-      <SafeAreaView style={styles.container}>
-        <FlatListHeader navigation={props.navigation} />
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#00ff00" />
-        </View>
-      </SafeAreaView>
-    );
-  }
+  return (
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.yt_video_key}
+        ListHeaderComponent={<FlatListHeader navigation={props.navigation} />}
+        stickyHeaderIndices={[0]}
+        extraData={data}
+        refreshControl={<RefreshControl onRefresh={props.onRefresh} />}
+      />
+    </SafeAreaView>
+  );
 };
 
 // sort by popupmenu styles

@@ -1,8 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ActivityIndicator, View, Text, StyleSheet } from "react-native";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from "@react-navigation/stack";
 import { MenuProvider } from "react-native-popup-menu";
 import {
   MaterialIcons,
@@ -33,7 +36,6 @@ const DarkTheme = {
 const App = () => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState({});
-  const [refreshing, setRefreshing] = React.useState(false);
 
   // SplashScreen.preventAutoHideAsync();
   // SplashScreen.hideAsync();
@@ -48,19 +50,17 @@ const App = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const onRefresh = React.useCallback(async () => {
-    setRefreshing(true);
+  const onRefresh = useCallback(async () => {
     try {
       let response = await fetch(
         "https://api.holotools.app/v1/live?max_upcoming_hours=730&hide_channel_desc=1"
       );
       let json = await response.json();
       setData(json);
-      setRefreshing(false);
     } catch (error) {
       console.error(error);
     }
-  }, [refreshing]);
+  }, []);
 
   const TabScreen = ({ navigation }) => {
     return (
@@ -85,12 +85,17 @@ const App = () => {
             }}
             children={() => (
               <MainScreen
-                data={[...data.live].filter((data) => {
-                  return data.live_start !== null;
-                })}
+                data={[...data.live]
+                  .filter((data) => {
+                    return data.live_start !== null;
+                  })
+                  .sort((a, b) => {
+                    return (
+                      new Date(b.live_schedule) - new Date(a.live_schedule)
+                    );
+                  })}
                 status={"live"}
                 onRefresh={onRefresh}
-                refreshing={refreshing}
                 navigation={navigation}
               />
             )}
@@ -107,10 +112,11 @@ const App = () => {
             }}
             children={() => (
               <MainScreen
-                data={[...data.upcoming]}
+                data={[...data.upcoming].sort((a, b) => {
+                  return new Date(a.live_schedule) - new Date(b.live_schedule);
+                })}
                 status={"upcoming"}
                 onRefresh={onRefresh}
-                refreshing={refreshing}
                 navigation={navigation}
               />
             )}
@@ -131,10 +137,11 @@ const App = () => {
             }}
             children={() => (
               <MainScreen
-                data={[...data.ended]}
+                data={[...data.ended].sort((a, b) => {
+                  return new Date(b.live_end) - new Date(a.live_end);
+                })}
                 status={"ended"}
                 onRefresh={onRefresh}
-                refreshing={refreshing}
                 navigation={navigation}
               />
             )}
@@ -165,6 +172,9 @@ const App = () => {
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
+            gestureEnabled: true,
+            gestureDirection: "horizontal",
+            cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
           }}
           initialRouteName="Home"
         >
